@@ -1,5 +1,49 @@
 <?php include('config.php');
-session_start();
+if (!isset($_SESSION)) {
+  session_start();
+}
+$MM_authorizedUsers = "";
+$MM_donotCheckaccess = "true";
+
+// *** Restrict Access To Page: Grant or deny access to this page
+function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
+  // For security, start by assuming the visitor is NOT authorized. 
+  $isValid = False; 
+
+  // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
+  // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
+  if (!empty($UserName)) { 
+    // Besides being logged in, you may restrict access to only certain users based on an ID established when they login. 
+    // Parse the strings into arrays. 
+    $arrUsers = Explode(",", $strUsers); 
+    $arrGroups = Explode(",", $strGroups); 
+    if (in_array($UserName, $arrUsers)) { 
+      $isValid = true; 
+    } 
+    // Or, you may restrict access to only certain users based on their username. 
+    if (in_array($UserGroup, $arrGroups)) { 
+      $isValid = true; 
+    } 
+    if (($strUsers == "") && true) { 
+      $isValid = true; 
+    } 
+  } 
+  return $isValid; 
+}
+
+$MM_restrictGoTo = "index.php";
+if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['username'], $_SESSION['MM_UserGroup'])))) {   
+  $MM_qsChar = "?";
+  $MM_referrer = $_SERVER['PHP_SELF'];
+  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
+  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+  header("Location: ". $MM_restrictGoTo); 
+  exit;
+}
+
+$currentPage = $_SERVER["PHP_SELF"];
 
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
@@ -22,6 +66,22 @@ $query_driver = $mysqli->query("SELECT * FROM `driver` WHERE driver_id='$admin_i
 $row_driver = $query_driver->fetch_assoc();
 $totalRows_driver = $query_driver->num_rows;
 }
+
+$query_rating = $mysqli->query("SELECT * FROM `rating` WHERE admin_id='$admin_id'");
+$row_rating = $query_rating->fetch_assoc();
+$totalRows_rating = $query_rating->num_rows;
+
+$average = 0;
+do
+{
+
+  $average = $average + $row_rating['star'];
+
+}while($row_rating = $query_rating->fetch_assoc());
+
+$average = $average / $totalRows_rating;
+
+
 
 
 ?>
@@ -90,11 +150,26 @@ $totalRows_driver = $query_driver->num_rows;
                   <tr>
                     <td><?=$i?></td>
                     <td>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
+                      <?php
+                      $j = 1;
+                      do
+                      {
+
+                        if ($j <= $average) 
+                        {
+                          ?>
+                            <span class="fa fa-star checked"></span>
+                          <?php
+                        }
+                        else
+                        {
+                          ?>
+                            <span class="fa fa-star"></span>
+                          <?php
+                        }
+                        $j++;
+                      }while($j <= 5);
+                      ?>
                     </td>
                     <td><?=date('d M Y', strtotime($row_driver['expiry']))?></td>
                     <td><?php if($row_driver['status'] == 1){echo "Active";}elseif($row_driver['status'] == 2){echo "Pending";}elseif($row_driver['status']==0){ echo "Not Active";}else{echo "Rejected";};?></td>
