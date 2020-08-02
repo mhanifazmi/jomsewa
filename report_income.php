@@ -1,5 +1,55 @@
 <?php require_once('config.php');
-session_start();
+if (!isset($_SESSION)) {
+  session_start();
+}
+$MM_authorizedUsers = "";
+$MM_donotCheckaccess = "true";
+
+// *** Restrict Access To Page: Grant or deny access to this page
+function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
+  // For security, start by assuming the visitor is NOT authorized. 
+  $isValid = False; 
+
+  // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
+  // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
+  if (!empty($UserName)) { 
+    // Besides being logged in, you may restrict access to only certain users based on an ID established when they login. 
+    // Parse the strings into arrays. 
+    $arrUsers = Explode(",", $strUsers); 
+    $arrGroups = Explode(",", $strGroups); 
+    if (in_array($UserName, $arrUsers)) { 
+      $isValid = true; 
+    } 
+    // Or, you may restrict access to only certain users based on their username. 
+    if (in_array($UserGroup, $arrGroups)) { 
+      $isValid = true; 
+    } 
+    if (($strUsers == "") && true) { 
+      $isValid = true; 
+    } 
+  } 
+  return $isValid; 
+}
+
+$MM_restrictGoTo = "index.php";
+if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['username'], $_SESSION['MM_UserGroup'])))) {   
+  $MM_qsChar = "?";
+  $MM_referrer = $_SERVER['PHP_SELF'];
+  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
+  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+  header("Location: ". $MM_restrictGoTo); 
+  exit;
+}
+
+if (isset($_POST['export_type']) && $_POST['export_type'] == 'excel') 
+{
+  header('report_income2.php?date_from='.$_POST['date_from'].'&date_to='.$_POST['date_to']);
+}
+
+
+$currentPage = $_SERVER["PHP_SELF"];
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];
@@ -19,7 +69,11 @@ if (isset($_POST['date_from']))
   $row_taxi = $query_taxi->fetch_assoc();
   $totalRows_taxi = $query_taxi->num_rows;
 
+}
 
+if (isset($_POST['type']) && $_POST['type'] == "excel") 
+{
+  header('Location: report_income2.php?date_from='.$from.'&date_to='.$to);
 }
 
 
@@ -32,7 +86,7 @@ if (isset($_POST['date_from']))
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Campus Pantry CMS</title>
+  <title>Jom Sewa Income Report</title>
   <link rel="stylesheet" href="vendors/iconfonts/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.addons.css">
@@ -66,7 +120,7 @@ if (isset($_POST['date_from']))
                       <thead>
                         <tr>
                           <th class="color" colspan="3" style="background-color: #dcdcdc; text-align: center; width: 10%; text-transform: uppercase; font-weight:bold;">
-                            <?php echo date('d-m-Y', strtotime($from)); ?> TO <?php echo date('d-m-Y', strtotime($to)); ?>
+                            <?php echo date('d M Y', strtotime($from)); ?> TO <?php echo date('d M Y', strtotime($to)); ?>
                           </th>
                         </tr>
                         <tr>
