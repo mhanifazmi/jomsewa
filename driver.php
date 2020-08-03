@@ -65,6 +65,22 @@ $row_driver = $query_driver->fetch_assoc();
 $totalRows_driver = $query_driver->num_rows;
 }
 
+$query_rating = $mysqli->query("SELECT * FROM `rating` WHERE admin_id='$admin_id'");
+$row_rating = $query_rating->fetch_assoc();
+$totalRows_rating = $query_rating->num_rows;
+
+$average = 0;
+do
+{
+
+  $average = $average + $row_rating['star'];
+
+}while($row_rating = $query_rating->fetch_assoc());
+
+$average = $average / $totalRows_rating;
+
+
+
 
 ?>
 <!DOCTYPE html>
@@ -132,11 +148,26 @@ $totalRows_driver = $query_driver->num_rows;
                   <tr>
                     <td><?=$i?></td>
                     <td>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
-                      <span class="fa fa-star"></span>
+                      <?php
+                      $j = 1;
+                      do
+                      {
+
+                        if ($j <= $average) 
+                        {
+                          ?>
+                            <span class="fa fa-star checked"></span>
+                          <?php
+                        }
+                        else
+                        {
+                          ?>
+                            <span class="fa fa-star"></span>
+                          <?php
+                        }
+                        $j++;
+                      }while($j <= 5);
+                      ?>
                     </td>
                     <td><?=date('d M Y', strtotime($row_driver['expiry']))?></td>
                     <td><?php if($row_driver['status'] == 1){echo "Active";}elseif($row_driver['status'] == 2){echo "Pending";}elseif($row_driver['status']==0){ echo "Not Active";}else{echo "Rejected";};?></td>
