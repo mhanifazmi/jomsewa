@@ -43,8 +43,6 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   exit;
 }
 
-$currentPage = $_SERVER["PHP_SELF"];
-
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 
