@@ -1,4 +1,5 @@
-<?php require_once('config.php');
+<?php include('config.php');
+
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -43,13 +44,8 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   exit;
 }
 
-if (isset($_POST['export_type']) && $_POST['export_type'] == 'excel') 
-{
-  header('report_income2.php?date_from='.$_POST['date_from'].'&date_to='.$_POST['date_to']);
-}
-
-
-$currentPage = $_SERVER["PHP_SELF"];
+                    
+                    
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];
@@ -59,7 +55,13 @@ $row_admin = $query_admin->fetch_assoc();
 $totalRows_admin = $query_admin->num_rows;
 
 $admin_id = $row_admin['admin_id'];
+                    
+if (isset($_POST['export_type']) && $_POST['export_type'] == 'excel') 
+{
+  header('report_income2.php?date_from='.$_POST['date_from'].'&date_to='.$_POST['date_to']);
+}
 
+$currentPage = $_SERVER["PHP_SELF"];
 if (isset($_POST['date_from'])) 
 {
   $from = $_POST['date_from'];
