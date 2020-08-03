@@ -44,7 +44,6 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
 }
 
 $currentPage = $_SERVER["PHP_SELF"];
-
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];

@@ -42,7 +42,6 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   header("Location: ". $MM_restrictGoTo); 
   exit;
 }
-
 $currentPage = $_SERVER["PHP_SELF"];
 
 $username = $_SESSION["username"];
