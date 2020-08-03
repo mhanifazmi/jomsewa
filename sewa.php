@@ -42,6 +42,7 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   header("Location: ". $MM_restrictGoTo); 
   exit;
 }
+$currentPage = $_SERVER["PHP_SELF"];
 
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
@@ -94,7 +95,13 @@ if (isset($_POST['date']))
 
   if ($tt == 1) 
   {
-    $sql = "INSERT INTO `sewa`(`datetime_start`, `hour`, `datetime_end`, `car_id`, `status`, `customer_id`, `sewa_id`) VALUES ('$datetime', '$hour', '$end', '$car_id',0, '$admin_id', '$sewa_id')";
+    $query_car = $mysqli->query("SELECT * FROM `car` WHERE car_id='$car_id'");
+    $row_car = $query_car->fetch_assoc();
+    $totalRows_car = $query_car->num_rows;
+
+    $owner_id = $row_car['admin_id'];
+
+    $sql = "INSERT INTO `sewa`(`datetime_start`, `hour`, `datetime_end`, `car_id`, `status`, `customer_id`, `owner_id`, `sewa_id`) VALUES ('$datetime', '$hour', '$end', '$car_id',0, '$admin_id', '$owner_id', '$sewa_id')";
 
   if (mysqli_query($mysqli, $sql)) {
       $insertGoTo = "booking.php?notif=success";
@@ -133,12 +140,55 @@ if (isset($_POST['date']))
   
   <link rel="stylesheet" href="vendor/fontawesome.css">
   <link rel="stylesheet" href="vendor/style3.css">
+  <link rel="stylesheet" href="vendor/datepicker3.css">
+  <link rel="stylesheet" href="vendor/timepicker.min.css">
   <script src="vendor/jquery2.js"></script>
   <script src="vendor/bootstrap.js"></script>
   <script src="vendor/fontawesome.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <link href="vendor/sweetalert2.css" rel="stylesheet">
 </head>
+<style type="text/css">
+  .input-group-addon {
+    padding: 6px 6px 6px 18px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555555;
+    text-align: center;
+    background-color: #eeeeee;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+}
+
+.timepicker{
+  .form-control {
+    background: #fff;
+  }
+}
+
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+      touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>
 <body>
 <?php include('sidenav_mobile.php'); ?>
 <div class="container-fluid">
@@ -156,15 +206,26 @@ if (isset($_POST['date']))
           <form action="sewa.php" method="POST" enctype="multipart/form-data">
 
             <label for="uname"><b>Date</b></label>
-            <input name="date" placeholder="Enter Date" type="date" class="street" style="margin-bottom: 10px; border-radius: 0px;" />
+            <div class="input-group date" data-provide="datepicker" style="margin-top: 0; margin-bottom: 10px; border-radius: 0px;">
+                <input name="date" type="text" class="form-control" style="border-radius: 0px; height: 50px;">
+                <div class="input-group-addon">
+                    <i class="icon fas fa-calendar"></i>
+                </div>
+            </div>
 
             <label for="uname"><b>Start Time</b></label>
-            <input name="time"  type="time" class="street" style="margin-bottom: 10px; border-radius: 0px;" />
+              <div class="input-group clockpicker" style="margin-top: 0; margin-bottom: 10px; border-radius: 0px;">
+                  <input name="time" type="text" class="form-control" value="09:30" style="border-radius: 0px; height: 50px;">
+                  <span class="input-group-addon">
+                      <i class="icon fas fa-clock"></i>
+                  </span>
+              </div>
 
             <label for="uname"><b>Hour(s)</b></label>
-            <input name="hour" value="1" type="number" class="street" style="margin-bottom: 10px; border-radius: 0px;" />
+            <input name="hour" value="1" type="number" class="street form-control" style="margin-bottom: 10px; border-radius: 0px; height: 50px;" />
 
-            <select name="car_id">
+            <label for="uname"><b>Car</b></label>
+            <select name="car_id" class="form-control" style="border-radius: 0px; height: 50px;">
               <?php
 
               $query_car = $mysqli->query("SELECT * FROM `car` WHERE status=1");
@@ -182,8 +243,8 @@ if (isset($_POST['date']))
               ?>
             </select>
             <div style="margin: auto; display: inline-block; text-align: center; width: 100%;">
-              <button class="btn btn-primary">Rent</button>
-              <a href="driver.php"><button type="button" class="btn btn-white">Cancel</button></a>
+              <button class="btn btn-primary form-control" style="height: 50px; border-radius: 0px;">Rent</button>
+              <a href="driver.php"><button type="button" class="btn btn-white form-control" style="height: 50px; border-radius: 0px;">Cancel</button></a>
             </div>
           </form>
           </div>
@@ -193,7 +254,19 @@ if (isset($_POST['date']))
 </div>
 
 <script src="vendor/sweetalert2.js"></script>
-
+<script src="vendor/bootstrap-datepicker.js"></script>
+<script src="vendor/moment.js"></script>
+<script src="vendor/timepicker.min.js"></script>
+<script type="text/javascript">
+  $('.datepicker').datepicker();
+</script>
+<script type="text/javascript">
+$('.clockpicker').clockpicker({
+    placement: 'right',
+    align: 'left',
+    donetext: 'Done'
+});
+</script>
 <?php if (isset($_GET['notif'])) { ?>
 <?php $notif = $_GET['notif']; if ($notif == "booked") { ?>
     <script type="text/javascript">
