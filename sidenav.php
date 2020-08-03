@@ -1,5 +1,49 @@
     <?php
+
+    $query_setting2 = $mysqli->query("SELECT * FROM `setting`");
+    $row_setting2 = $query_setting2->fetch_assoc();
+    $totalRows_setting2 = $query_setting2->num_rows;
+
+    if (isset($_GET['dark_mode'])) 
+    {
+      
+
+      if ($row_setting2['style'] == 1) 
+      {
+        $style = 0;
+      }
+      else
+      {
+        $style = 1;
+      }
+
+      $sql = "UPDATE `setting` SET `style`='$style'";
+
+      if (mysqli_query($mysqli, $sql)) 
+      {
+          $insertGoTo = "?notif=success";
+          header(sprintf("Location: %s", $insertGoTo));
+      } 
+      else 
+      {
+          $insertGoTo = "?notif=failed";
+          header(sprintf("Location: %s", $insertGoTo));
+      }
+    }
+
+    
+
     $url = "$_SERVER[REQUEST_URI]";
+
+      $active1 = "";
+      $active2 = "";
+      $active3 = "";
+      $active4 = "";
+      $active5 = "";
+      $active6 = "";
+      $active7 = "";
+      $active8 = "";
+      $active9 = "";
 
     if ($url == "/jomsewa/home.php") 
     {
@@ -88,9 +132,9 @@
     if ($url == "/jomsewa/reload.php") 
     {
       $active1 = "";
-      $active2 = "active";
+      $active2 = "";
       $active3 = "";
-      $active4 = "";
+      $active4 = "active";
       $active5 = "";
       $active6 = "";
       $active7 = "";
@@ -101,7 +145,7 @@
 
     ?>
 
-    <div class="col-sm-2 sidenav hidden-xs">
+    <div class="col-sm-2 sidenav hidden-xs" style="padding-right: 0px; padding-left: 0px;">
       <div class="logo">
       	<?php
           if ($row_setting['style'] == 1) {
@@ -121,8 +165,21 @@
         <li class="<?=$active6?>"><a href="car.php"><i class="icon fas fa-car"></i> Car Manager</a></li>
         <li class="<?=$active7?>"><a href="driver.php"><i class="icon fas fa-user-tie"></i> Driver Manager</a></li>
         <li class="<?=$active8?>"><a href="report_date1.php"><i class="icon fas fa-folder"></i> Report Income</a></li>
-        <li class="<?=$active8?>"><a href="report_driver.php"><i class="icon fas fa-folder"></i> Report Driver</a></li>
-        <li class="<?=$active8?>"><a href="report_customer.php"><i class="icon fas fa-folder"></i> Report Customer</a></li>
         <li class="<?=$active9?>"><a href="user.php"><i class="icon fas fa-user"></i> Profile</a></li>
+        <?php
+        if ($row_setting2['style'] == 1) 
+        {
+          ?>
+            <li class="<?=$active9?>"><a href="?dark_mode=1"><i class="icon fas fa-wrench"></i> Dark Mode</a></li>
+          <?php
+        }
+        else
+        {
+          ?>
+            <li class="<?=$active9?>"><a href="?dark_mode=1"><i class="icon fas fa-wrench"></i> Light Mode</a></li>
+          <?php
+        }
+        ?>
+        
       </ul><br>
     </div>

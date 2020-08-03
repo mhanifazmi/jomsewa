@@ -43,6 +43,8 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   exit;
 }
 
+$currentPage = $_SERVER["PHP_SELF"];
+
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];
@@ -125,11 +127,25 @@ if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
   
   <link rel="stylesheet" href="vendor/fontawesome.css">
   <link rel="stylesheet" href="vendor/style3.css">
+  <link rel="stylesheet" href="vendor/datepicker3.css">
   <script src="vendor/jquery.js"></script>
   <script src="vendor/bootstrap.js"></script>
   <script src="vendor/fontawesome.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 </head>
+<style type="text/css">
+  .input-group-addon {
+    padding: 6px 6px 6px 18px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555555;
+    text-align: center;
+    background-color: #eeeeee;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+}
+</style>
 <body>
 <?php include('sidenav_mobile.php'); ?>
 <div class="container-fluid">
@@ -146,7 +162,12 @@ if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
           <br>
           <form action="maintenance_add.php" method="POST" enctype="multipart/form-data">
             <label for="uname"><b>Date</b></label>
-            <input type="date" placeholder="Enter Car Model" name="date" required value="">
+            <div class="input-group date" data-provide="datepicker" style="margin-top: 0; margin-bottom: 10px; border-radius: 0px;">
+                <input name="date" type="text" class="form-control" style="border-radius: 0px; height: 50px;">
+                <div class="input-group-addon">
+                    <i class="icon fas fa-calendar"></i>
+                </div>
+            </div>
 
             <label for="uname"><b>Receipt</b></label>
             <input type="file" placeholder="Enter Receipt" name="image" required value="">
@@ -233,6 +254,9 @@ if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
     </div>
   </div>
 </div>
-
+<script src="vendor/bootstrap-datepicker.js"></script>
+<script type="text/javascript">
+  $('.datepicker').datepicker();
+</script>
 </body>
 </html>
