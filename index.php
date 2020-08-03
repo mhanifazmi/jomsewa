@@ -1,30 +1,81 @@
 <?php include('config.php');
 
-session_start();
-
-if (isset($_POST['username'])) 
+if (!function_exists("GetSQLValueString")) {
+function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
-  $username = $_POST['username'];
-  $password = $_POST['password'];
-
-  $query_admin = $mysqli->query("SELECT * FROM `admin` WHERE username='$username' AND password='$password'");
-  $row_admin = $query_admin->fetch_assoc();
-  $totalRows_admin = $query_admin->num_rows;
-
-  if (isset($row_admin['id'])) 
-  {
-    $_SESSION["username"] = $username;
-    $_SESSION["password"] = $password;
-    $_SESSION["admin_id"] = $row_admin['admin_id'];
-
-    header('Location: home.php');
+  if (PHP_VERSION < 6) {
+    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
-  else
-  {
-    header('Location: index.php');
+
+  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+
+  switch ($theType) {
+    case "text":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;    
+    case "long":
+    case "int":
+      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
+      break;
+    case "double":
+      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
+      break;
+    case "date":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;
+    case "defined":
+      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
+      break;
   }
+  return $theValue;
+}
+}
+?>
+<?php
+// *** Validate request to login to this site.
+if (!isset($_SESSION)) {
+  session_start();
 }
 
+$loginFormAction = $_SERVER['PHP_SELF'];
+if (isset($_GET['accesscheck'])) {
+  $_SESSION['PrevUrl'] = $_GET['accesscheck'];
+}
+
+if (isset($_POST['username'])) {
+  $loginUsername=$mysqli->real_escape_string($_POST['username']);
+  $password=$mysqli->real_escape_string($_POST['password']);
+  $hash=crypt($password, '$6$rounds=5000$jomsewa$') ;
+  $MM_fldUserAuthorization = "";
+  $MM_redirectLoginSuccess = "home.php";
+  $MM_redirectLoginFailed = "index.php?notif=fail";
+  $MM_redirecttoReferrer = false;
+
+  $result = $mysqli->query("SELECT * FROM `admin` WHERE username='$loginUsername' AND password='$hash'");
+  $admin = $result->fetch_assoc();
+
+  $loginFoundUser = $result->num_rows;
+  if ($loginFoundUser) 
+  {
+     $loginStrGroup = "";
+    
+  if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
+    //declare two session variables and assign them
+    $_SESSION['username'] = $loginUsername;
+    $_SESSION['password'] = $hash;
+    $_SESSION['MM_UserGroup'] = $loginStrGroup; 
+    $_SESSION["mode"] = "0";
+
+    if (isset($_SESSION['PrevUrl']) && false) 
+    {
+      $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];  
+    }
+    header("Location: " . $MM_redirectLoginSuccess );
+  }
+  else {
+    header("Location: ". $MM_redirectLoginFailed );
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
