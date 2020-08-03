@@ -43,6 +43,8 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   exit;
 }
 
+$currentPage = $_SERVER["PHP_SELF"];
+
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];
@@ -130,11 +132,17 @@ if (isset($_POST['idd']))
           <form action="report_income.php" method="POST">
 
             <label style="display: block;" for="exampleInputPassword2" class=" col-form-label">Date</label>
-                      <div class="input-group" style="width:100%; text-align: center; margin: auto;">
-                        <input name="date_from" style="text-align: center; font-size: 15px;" type="text" class="form-control datepicker" value="<?=date('d-m-Y')?>">
+                    <div class="input-group" style="width:100%; text-align: center; margin: auto;">
+                        <input name="date_from" style="text-align: center; font-size: 15px; height: 50px;" type="text" class="form-control datepicker" value="<?=date('d-m-Y')?>">
                         <div class="input-group-addon" style="padding: 15px; background-color: #dcdcdc">To</div>
-                        <input name="date_to" style="text-align: center; font-size: 15px;" type="text" class="form-control datepicker" value="<?=date('d-m-Y')?>">
+                        <input name="date_to" style="text-align: center; font-size: 15px; height: 50px;" type="text" class="form-control datepicker" value="<?=date('d-m-Y')?>">
                     </div>
+
+            <label style="display: block;" for="exampleInputPassword2" class=" col-form-label">Export Type</label>
+            <select name="type">
+              <option value="pdf">PDF</option>
+              <option value="excel">Excel</option>
+            </select>
 
             <input type="hidden" name="admin_id" value="<?=$row_admin['admin_id']?>">
             <div style="margin: auto; display: inline-block; text-align: center; width: 100%;">

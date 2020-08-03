@@ -1,4 +1,5 @@
 <?php include('config.php');
+
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -42,6 +43,9 @@ if (!((isset($_SESSION['username'])) && (isAuthorized("",$MM_authorizedUsers, $_
   header("Location: ". $MM_restrictGoTo); 
   exit;
 }
+
+                    
+                    
 $username = $_SESSION["username"];
 $password = $_SESSION["password"];
 $password = $_SESSION["password"];
@@ -51,7 +55,13 @@ $row_admin = $query_admin->fetch_assoc();
 $totalRows_admin = $query_admin->num_rows;
 
 $admin_id = $row_admin['admin_id'];
+                    
+if (isset($_POST['export_type']) && $_POST['export_type'] == 'excel') 
+{
+  header('report_income2.php?date_from='.$_POST['date_from'].'&date_to='.$_POST['date_to']);
+}
 
+$currentPage = $_SERVER["PHP_SELF"];
 if (isset($_POST['date_from'])) 
 {
   $from = $_POST['date_from'];
@@ -61,7 +71,11 @@ if (isset($_POST['date_from']))
   $row_taxi = $query_taxi->fetch_assoc();
   $totalRows_taxi = $query_taxi->num_rows;
 
+}
 
+if (isset($_POST['type']) && $_POST['type'] == "excel") 
+{
+  header('Location: report_income2.php?date_from='.$from.'&date_to='.$to);
 }
 
 
@@ -74,7 +88,7 @@ if (isset($_POST['date_from']))
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Campus Pantry CMS</title>
+  <title>Jom Sewa Income Report</title>
   <link rel="stylesheet" href="vendors/iconfonts/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.addons.css">
@@ -108,7 +122,7 @@ if (isset($_POST['date_from']))
                       <thead>
                         <tr>
                           <th class="color" colspan="3" style="background-color: #dcdcdc; text-align: center; width: 10%; text-transform: uppercase; font-weight:bold;">
-                            <?php echo date('d-m-Y', strtotime($from)); ?> TO <?php echo date('d-m-Y', strtotime($to)); ?>
+                            <?php echo date('d M Y', strtotime($from)); ?> TO <?php echo date('d M Y', strtotime($to)); ?>
                           </th>
                         </tr>
                         <tr>
