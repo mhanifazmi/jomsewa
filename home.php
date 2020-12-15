@@ -199,7 +199,7 @@ if ($row_admin['type'] == 0)
 }
 ?>
       <div class="well">
-        <h4>Announcement22</h4>
+        <h4>Announcement33</h4>
 
         <table class="table table-bordered">
             <thead>
